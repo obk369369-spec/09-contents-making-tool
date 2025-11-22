@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Contents Making Tool</title>
+<style>
+body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f5f5;}
+header{background:#111827;color:#fff;padding:12px 18px;font-size:16px;font-weight:600;}
+main{padding:14px;max-width:1180px;margin:0 auto;}
+.panel{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);margin-bottom:12px;}
+.panel h2{margin:0 0 8px 0;font-size:15px;border-bottom:1px solid #e5e7eb;padding-bottom:5px;}
+label{display:block;margin-top:7px;font-size:13px;font-weight:600;color:#374151;}
+input,textarea,select{width:100%;margin-top:4px;padding:7px 8px;font-size:13px;border:1px solid #d1d5db;border-radius:5px;resize:vertical;}
+textarea{min-height:100px;}
+.btn{margin-top:10px;background:#2563eb;color:#fff;border:none;border-radius:4px;padding:8px 11px;font-size:13px;cursor:pointer;}
+.btn:disabled{opacity:0.45;cursor:default;}
+.box{margin-top:5px;border:1px solid #e5e7eb;background:#f9fafb;border-radius:5px;padding:7px;font-size:13px;white-space:pre-line;min-height:40px;}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+.chip{padding:4px 8px;border-radius:999px;font-size:12px;background:#e5e7eb;color:#111827;}
+.chip.main{background:#dbeafe;color:#1d4ed8;}
+footer{margin-top:12px;font-size:11px;color:#6b7280;text-align:right;}
+@media(max-width:980px){main{padding:8px;}}
+</style>
+</head>
+<body>
+
+<header>Contents Making Tool</header>
+
+<main>
+
+<div class="panel">
+<h2>1) 컨텐츠 입력</h2>
+<label>제목</label>
+<input id="title">
+<label>요약 또는 주요 문단</label>
+<textarea id="summary"></textarea>
+<label>중요 키워드 (쉼표 , 로 구분)</label>
+<input id="keywords">
+<label>사용 채널</label>
+<select id="channel">
+<option value="email">이메일 안내</option>
+<option value="web">웹 게시</option>
+<option value="bidding">입찰/과제용</option>
+<option value="mix">이메일+웹 병행</option>
+<option value="other">기타</option>
+</select>
+<button class="btn" id="analyze">컨텐츠 분석 실행</button>
+</div>
+
+<div class="panel">
+<h2>2) 분석 결과</h2>
+<label>핵심 키워드</label>
+<div class="chips" id="kwBox"><span class="chip">분석 전</span></div>
+<label>산업 분야</label>
+<div class="chips" id="fieldBox"><span class="chip">분석 전</span></div>
+<label>고객 그룹</label>
+<div class="box" id="segBox">분석 전입니다.</div>
+<label>한 줄 요약</label>
+<div class="box" id="sumBox">분석 전입니다.</div>
+</div>
+
+<div class="panel">
+<h2>3) 안내문 생성</h2>
+<label>타깃 고객 메모 (선택)</label>
+<input id="target">
+<label>[제목] 이메일 안내 제목</label>
+<div class="box" id="subBox"></div>
+<label>[본문] 안내문</label>
+<div class="box" id="bodyBox"></div>
+<button class="btn" id="regen">안내문 재생성</button>
+<button class="btn" id="cSub">제목 복사</button>
+<button class="btn" id="cBody">본문 복사</button>
+</div>
+
+</main>
+
+<footer>Contents → 분석 → 안내문 생성. 오직 이 기능만 존재.</footer>
+
+<script>
+function n(t){return t.replace(/\r?\n/g," ").replace(/[(){}\[\].,;:+*/\\!?"'<>]|[-]/g," ").toLowerCase();}
+function extract(raw,extra){
+const text=n(raw||"");
+const t=text.split(/\s+/).filter(Boolean);
+const stop=["및","그리고","또한","시장","자료","보고","분석","연구","대한","하는","있는","최근","기술","산업","전망","module","market","report"];
+const f={};t.forEach(w=>{if(w.length<2)return;if(stop.includes(w))return;f[w]=(f[w]||0)+1;});
+(extra||[]).forEach(k=>{const w=k.trim().toLowerCase();if(w)f[w]=(f[w]||0)+3;});
+return Object.entries(f).sort((a,b)=>b[1]-a[1]).map(v=>v[0]).slice(0,8);
+}
+function fields(txt){
+const t=(txt||"").toLowerCase(),out=[];
+const rules=[
+{name:"자동차/모빌리티",k:["자동차","전기차","ev","adas","자율주행","모빌리티","물류"]},
+{name:"통신/IT/보안",k:["통신","5g","iot","보안","security","cloud","ai","it"]},
+{name:"소재/화학/접착제",k:["접착","점착","테이프","adhesive","resin","polymer","glass substrate","글래스 기판","bonding"]},
+{name:"반도체/디스플레이",k:["반도체","semiconductor","웨이퍼","패키징","display","oled"]},
+{name:"에너지/배터리/태양광",k:["배터리","2차전지","ess","태양광","solar","solar cell","perovskite"]},
+{name:"바이오/의료",k:["바이오","bio","제약","medical","헬스케어"]},
+{name:"정책/경제/산업전략",k:["정책","policy","규제","investment","경제","산업동향"]}
+];
+rules.forEach(r=>{if(r.k.some(x=>t.includes(x.toLowerCase())))out.push(r.name);});
+return out.length?out:["기타/범용"];
+}
+function seg(fs,ch){
+const s=[],h=n=>fs.includes(n);
+if(h("소재/화학/접착제")||h("반도체/디스플레이")||h("에너지/배터리/태양광")){s.push("• 정부출연연 연구원 및 기업 R&D 소재·공정팀");}
+if(h("자동차/모빌리티"))s.push("• 완성차·부품사 R&D 및 전략팀");
+if(h("통신/IT/보안"))s.push("• IT/보안 기술연구팀");
+if(h("바이오/의료"))s.push("• 바이오/의료 연구팀");
+if(h("정책/경제/산업전략"))s.push("• 정책/산업전략 연구자");
+if(!s.length)s.push("• 일반 R&D 및 전략기획 부서");
+if(ch==="bidding")s.push("• 입찰/과제 담당 부서");
+return s;
+}
+function oneLine(t,fs,sg){
+const tt=t?`「${t}」`:"이 컨텐츠";
+const f=fs.join(", ");
+return `• ${tt}를 ${f} 자료로 보고,\n• 주로 ${sg[0].replace(/^•\s*/,"")}에게 안내하도록 추천합니다.`;
+}
+function mail(t,fs,kw,sg,ch,target){
+const f=fs[0],k=kw.length?`주요 키워드는 ${kw.slice(0,5).join(", ")} 입니다.`:"핵심 키워드는 요약문 참고";
+let tar=`이번 안내의 주요 대상은 ${sg[0].replace(/^•\s*/,"")} 입니다.`;if(target.trim())tar+=`\n(특히 ${target.trim()} 대상)`;
+let chLine="";if(ch==="email")chLine="이메일 회신 시 상세목차 제공";
+else if(ch==="web")chLine="웹 게시 + 문의 시 상세 정보 제공";
+else if(ch==="bidding")chLine="입찰/과제 배경자료로 제공 가능";
+else if(ch==="mix")chLine="웹 게시 + 핵심 고객 이메일 병행";
+else chLine="요청 방식에 따라 제공";
+return {
+subject:`[자료 안내] ${t||"신규 컨텐츠"} – ${f}`,
+body:`안녕하세요, 월드산업정보센터(WIC)입니다.\n\n${f} 관련 신규 컨텐츠를 안내드립니다.\n${k}\n\n${tar}\n\n관심 있으시면 회신 또는 문의 주시면 상세 목차와 제공 방식을 보내드리겠습니다.\n${chLine}\n\n감사합니다.\n월드산업정보센터 드림`
+};
+}
+function chips(box,arr){
+box.innerHTML="";
+arr.forEach((v,i)=>{const x=document.createElement("span");x.className="chip"+(i===0?" main":"");x.textContent=v;box.appendChild(x);});
+}
+
+const el={
+title:document.getElementById("title"),
+summary:document.getElementById("summary"),
+keywords:document.getElementById("keywords"),
+channel:document.getElementById("channel"),
+target:document.getElementById("target"),
+kwBox:document.getElementById("kwBox"),
+fieldBox:document.getElementById("fieldBox"),
+segBox:document.getElementById("segBox"),
+sumBox:document.getElementById("sumBox"),
+subBox:document.getElementById("subBox"),
+bodyBox:document.getElementById("bodyBox")
+};
+let S={kw:[],fs:[],sg:[],ml:{}};
+
+document.getElementById("analyze").onclick=()=>{
+const title=el.title.value||"",summary=el.summary.value||"",extra=el.keywords.value.split(",").map(v=>v.trim()).filter(Boolean),ch=el.channel.value;
+const base=[title,summary,extra.join(" ")].join(" ");
+const kw=extract(base,extra),fs=fields(base),sg=seg(fs,ch);
+S.kw=kw;S.fs=fs;S.sg=sg;
+chips(el.kwBox,kw);chips(el.fieldBox,fs);
+el.segBox.textContent=sg.join("\n");
+el.sumBox.textContent=oneLine(title,fs,sg);
+const m=mail(title,fs,kw,sg,ch,el.target.value);S.ml=m;
+el.subBox.textContent=m.subject;el.bodyBox.textContent=m.body;
+};
+
+document.getElementById("regen").onclick=()=>{
+const m=mail(el.title.value||"",S.fs.length?S.fs:["기타/범용"],S.kw,S.sg,el.channel.value,el.target.value);
+S.ml=m;el.subBox.textContent=m.subject;el.bodyBox.textContent=m.body;
+};
+
+document.getElementById("cSub").onclick=()=>navigator.clipboard.writeText(el.subBox.textContent||"");
+document.getElementById("cBody").onclick=()=>navigator.clipboard.writeText(el.bodyBox.textContent||"");
+</script>
+
+</body>
+</html>
