@@ -1,174 +1,1827 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>Contents Making Tool</title>
-<style>
-body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f5f5;}
-header{background:#111827;color:#fff;padding:12px 18px;font-size:16px;font-weight:600;}
-main{padding:14px;max-width:1180px;margin:0 auto;}
-.panel{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08);margin-bottom:12px;}
-.panel h2{margin:0 0 8px 0;font-size:15px;border-bottom:1px solid #e5e7eb;padding-bottom:5px;}
-label{display:block;margin-top:7px;font-size:13px;font-weight:600;color:#374151;}
-input,textarea,select{width:100%;margin-top:4px;padding:7px 8px;font-size:13px;border:1px solid #d1d5db;border-radius:5px;resize:vertical;}
-textarea{min-height:100px;}
-.btn{margin-top:10px;background:#2563eb;color:#fff;border:none;border-radius:4px;padding:8px 11px;font-size:13px;cursor:pointer;}
-.btn:disabled{opacity:0.45;cursor:default;}
-.box{margin-top:5px;border:1px solid #e5e7eb;background:#f9fafb;border-radius:5px;padding:7px;font-size:13px;white-space:pre-line;min-height:40px;}
-.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
-.chip{padding:4px 8px;border-radius:999px;font-size:12px;background:#e5e7eb;color:#111827;}
-.chip.main{background:#dbeafe;color:#1d4ed8;}
-footer{margin-top:12px;font-size:11px;color:#6b7280;text-align:right;}
-@media(max-width:980px){main{padding:8px;}}
-</style>
+  <meta charset="UTF-8" />
+  <title>9번 도구 · 컨텐츠 자료 안내 도구 · WIC 자동화 시스템2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg-body: #f3f6fb;
+      --bg-card: #ffffff;
+      --bg-card-alt: #f9fbff;
+      --border-soft: #d6ddeb;
+      --border-strong: #a7b5d8;
+      --accent: #4b7bec;
+      --accent-soft: rgba(75, 123, 236, 0.08);
+      --accent-strong: #335fba;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --text-soft: #9ca3af;
+      --danger: #e11d48;
+      --danger-soft: #fee2e2;
+      --success: #059669;
+      --success-soft: #dcfce7;
+      --radius-card: 14px;
+      --shadow-soft: 0 12px 24px rgba(15, 23, 42, 0.06);
+      --shadow-subtle: 0 2px 6px rgba(15, 23, 42, 0.04);
+      --transition-fast: 0.16s ease-out;
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-main);
+      background: radial-gradient(circle at top left, #eef2ff 0, #f3f6fb 40%, #eef2ff 100%);
+      color: var(--text-main);
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-root {
+      max-width: 1200px;
+      margin: 20px auto 32px;
+      padding: 0 16px;
+    }
+
+    .app-header {
+      background: linear-gradient(135deg, #e0edff, #f5f7ff);
+      border-radius: 18px;
+      box-shadow: var(--shadow-soft);
+      padding: 18px 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .app-title-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .app-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #111827;
+    }
+
+    .app-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      font-size: 0.78rem;
+      color: var(--accent-strong);
+      border: 1px solid rgba(75, 123, 236, 0.35);
+      white-space: nowrap;
+    }
+
+    .app-sub {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .app-sub span.tag {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, 0.06);
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      color: #047857;
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    .app-sub span.info {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .app-sub span.info strong {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .app-sub small.note {
+      color: var(--text-soft);
+      font-size: 0.75rem;
+    }
+
+    .layout {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: minmax(0, 0.46fr) minmax(0, 0.54fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-subtle);
+      padding: 14px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 0.98rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-title span.index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+
+    .pill {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      color: var(--text-soft);
+      background: #f9fafb;
+      white-space: nowrap;
+    }
+
+    .card-section-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #4b5563;
+      margin-top: 2px;
+    }
+
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .form-row-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .form-row-inline > * {
+      flex: 1 1 120px;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #4b5563;
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+    }
+
+    label span.req {
+      color: #dc2626;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    textarea,
+    select {
+      width: 100%;
+      border-radius: 9px;
+      border: 1px solid #d1d5db;
+      padding: 7px 9px;
+      font-size: 0.85rem;
+      outline: none;
+      background: #f9fafb;
+      color: var(--text-main);
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+    }
+
+    input[type="text"]:focus,
+    input[type="url"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.25);
+      background: #ffffff;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+      max-height: 220px;
+      line-height: 1.45;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #cbd5e1;
+    }
+
+    .muted {
+      font-size: 0.75rem;
+      color: var(--text-soft);
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: -2px;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: default;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      color: #374151;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(148, 163, 184, 0.35);
+      transform: translateY(-0.5px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px dashed #d1d5db;
+      color: #6b7280;
+    }
+
+    .btn-ghost:hover:not(:disabled) {
+      background: #f9fafb;
+      border-style: solid;
+    }
+
+    .btn-danger {
+      background: var(--danger-soft);
+      border: 1px solid rgba(248, 113, 113, 0.6);
+      color: var(--danger);
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: #fee2e2;
+      box-shadow: 0 3px 8px rgba(248, 113, 113, 0.35);
+    }
+
+    .status-line {
+      margin-top: 4px;
+      font-size: 0.74rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      border: 1px solid transparent;
+    }
+
+    .status-chip.success {
+      background: var(--success-soft);
+      border-color: rgba(34, 197, 94, 0.7);
+      color: var(--success);
+    }
+
+    .status-chip.warn {
+      background: #fef9c3;
+      border-color: #facc15;
+      color: #a16207;
+    }
+
+    .status-chip.idle {
+      background: #e5e7eb;
+      border-color: #d1d5db;
+      color: #4b5563;
+    }
+
+    .status-text {
+      color: var(--text-soft);
+    }
+
+    .status-text strong {
+      color: #111827;
+    }
+
+    .content-list {
+      margin-top: 4px;
+      border-radius: 10px;
+      background: var(--bg-card-alt);
+      border: 1px solid #e5e7eb;
+      padding: 6px;
+      max-height: 340px;
+      overflow: auto;
+    }
+
+    .content-list-empty {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      padding: 8px;
+    }
+
+    .content-item {
+      border-radius: 10px;
+      padding: 7px 8px;
+      margin-bottom: 4px;
+      background: #ffffff;
+      border: 1px solid transparent;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      cursor: pointer;
+      transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .content-item:hover {
+      background: #f3f4ff;
+      border-color: var(--border-strong);
+      box-shadow: 0 3px 8px rgba(148, 163, 184, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .content-item.selected {
+      border-color: var(--accent-strong);
+      box-shadow: 0 3px 8px rgba(37, 99, 235, 0.45);
+      background: #e0ebff;
+    }
+
+    .content-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .content-item-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .content-item-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 2px;
+      font-size: 0.72rem;
+      color: var(--text-soft);
+    }
+
+    .badge {
+      padding: 0 6px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      white-space: nowrap;
+    }
+
+    .badge.type-report {
+      border-color: rgba(37, 99, 235, 0.45);
+      background: rgba(219, 234, 254, 0.7);
+      color: #1d4ed8;
+    }
+
+    .badge.type-video {
+      border-color: rgba(16, 185, 129, 0.5);
+      background: rgba(209, 250, 229, 0.7);
+      color: #047857;
+    }
+
+    .badge.type-article {
+      border-color: rgba(234, 179, 8, 0.75);
+      background: rgba(254, 243, 199, 0.8);
+      color: #92400e;
+    }
+
+    .badge.lang {
+      border-color: rgba(148, 163, 184, 0.9);
+      background: #f9fafb;
+      color: #4b5563;
+    }
+
+    .badge.hidden {
+      border-color: rgba(148, 163, 184, 0.9);
+      background: #e5e7eb;
+      color: #4b5563;
+      text-decoration: line-through;
+    }
+
+    .content-item-keywords {
+      font-size: 0.72rem;
+      color: var(--text-soft);
+      margin-top: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .filters-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+      align-items: center;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      padding: 2px 9px;
+      font-size: 0.72rem;
+      background: #f9fafb;
+      color: #4b5563;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .chip span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #9ca3af;
+    }
+
+    .chip.active {
+      border-color: var(--accent);
+      background: #e0ebff;
+      color: var(--accent-strong);
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.35);
+    }
+
+    .chip.active span.dot {
+      background: var(--accent-strong);
+    }
+
+    .chip-muted {
+      border-style: dashed;
+      opacity: 0.85;
+    }
+
+    .tagline {
+      font-size: 0.74rem;
+      color: var(--text-soft);
+      margin-top: -4px;
+    }
+
+    .notice-box {
+      margin-top: 4px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: #eff6ff;
+      border: 1px dashed #bfdbfe;
+      font-size: 0.75rem;
+      color: #1d4ed8;
+    }
+
+    .notice-box strong {
+      font-weight: 600;
+    }
+
+    .preview-box {
+      margin-top: 4px;
+      border-radius: 10px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      padding: 8px 9px;
+      font-size: 0.82rem;
+      max-height: 260px;
+      overflow: auto;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    .preview-placeholder {
+      color: var(--text-soft);
+      font-size: 0.8rem;
+    }
+
+    .preview-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      font-size: 0.75rem;
+      color: var(--text-soft);
+    }
+
+    .preview-meta-row span.count {
+      color: #4b5563;
+    }
+
+    .preview-meta-row span.count strong {
+      color: #111827;
+    }
+
+    .small-pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+
+    .section-divider {
+      margin: 4px 0;
+      border-top: 1px dashed #e5e7eb;
+    }
+
+    .url-row {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 2px;
+      font-size: 0.76rem;
+      color: var(--text-soft);
+    }
+
+    .url-row span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .url-row code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.74rem;
+      background: #f3f4f6;
+      padding: 2px 4px;
+      border-radius: 6px;
+      color: #374151;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .counter-text {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+    }
+  </style>
 </head>
 <body>
+  <div class="app-root">
+    <header class="app-header">
+      <div class="app-title-row">
+        <div class="app-title">9번 도구 · 컨텐츠 자료 안내 도구</div>
+        <div class="app-badge">
+          <span>WIC 컨텐츠 · 고객 안내 전용</span>
+          <span>Local-only · Safe DOM · v1.0</span>
+        </div>
+      </div>
+      <div class="app-sub">
+        <span class="info">
+          <strong>목적</strong> 외부/내부 컨텐츠를 한 화면에서 정리하고, 고객 맞춤 안내문을 자동 생성
+        </span>
+        <span class="tag">이 화면에 보이는 것만 동작 · 저장은 브라우저 localStorage</span>
+        <small class="note">보고서, 동영상, 기사 등 WIC가 안내할 수 있는 자료를 카드형으로 관리하고, 선택 항목으로 안내 메일 초안을 만듭니다.</small>
+      </div>
+    </header>
 
-<header>Contents Making Tool</header>
+    <main class="layout">
+      <!-- LEFT: 컨텐츠 목록 & 검색 -->
+      <section class="card" aria-label="컨텐츠 목록과 검색">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              <span class="index">①</span>
+              컨텐츠 목록 &amp; 검색
+            </div>
+            <div class="card-subtitle">보고서 / 동영상 / 기사 등을 한 눈에 보고 선택</div>
+          </div>
+          <span class="pill" id="contentCountLabel">등록 0건</span>
+        </div>
 
-<main>
+        <div class="form-row">
+          <label for="searchInput">
+            컨텐츠 검색 (제목 / 키워드 / 발행사)
+          </label>
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="예: 후지경제 / SK 스페셜티 / Sulfur Hexafluoride..."
+          />
+          <div class="hint">검색어를 비우면 전체 목록이 다시 보입니다.</div>
+        </div>
 
-<div class="panel">
-<h2>1) 컨텐츠 입력</h2>
-<label>제목</label>
-<input id="title">
-<label>요약 또는 주요 문단</label>
-<textarea id="summary"></textarea>
-<label>중요 키워드 (쉼표 , 로 구분)</label>
-<input id="keywords">
-<label>사용 채널</label>
-<select id="channel">
-<option value="email">이메일 안내</option>
-<option value="web">웹 게시</option>
-<option value="bidding">입찰/과제용</option>
-<option value="mix">이메일+웹 병행</option>
-<option value="other">기타</option>
-</select>
-<button class="btn" id="analyze">컨텐츠 분석 실행</button>
-</div>
+        <div class="filters-row" aria-label="필터">
+          <span class="counter-text">필터:</span>
+          <button type="button" class="chip chip-muted active" data-filter="status-active">
+            <span class="dot"></span> 사용 중만
+          </button>
+          <button type="button" class="chip chip-muted" data-filter="status-all">
+            <span class="dot"></span> 숨김 포함
+          </button>
+          <button type="button" class="chip" data-filter="type-report">
+            <span class="dot"></span> 보고서
+          </button>
+          <button type="button" class="chip" data-filter="type-video">
+            <span class="dot"></span> 동영상
+          </button>
+          <button type="button" class="chip" data-filter="type-article">
+            <span class="dot"></span> 기사/뉴스
+          </button>
+          <button type="button" class="chip" data-filter="type-other">
+            <span class="dot"></span> 기타
+          </button>
+        </div>
 
-<div class="panel">
-<h2>2) 분석 결과</h2>
-<label>핵심 키워드</label>
-<div class="chips" id="kwBox"><span class="chip">분석 전</span></div>
-<label>산업 분야</label>
-<div class="chips" id="fieldBox"><span class="chip">분석 전</span></div>
-<label>고객 그룹</label>
-<div class="box" id="segBox">분석 전입니다.</div>
-<label>한 줄 요약</label>
-<div class="box" id="sumBox">분석 전입니다.</div>
-</div>
+        <div class="filters-row" aria-label="언어 필터">
+          <span class="counter-text">언어:</span>
+          <button type="button" class="chip chip-muted active" data-filter="lang-all">
+            <span class="dot"></span> 전체
+          </button>
+          <button type="button" class="chip" data-filter="lang-ko">
+            <span class="dot"></span> 국문
+          </button>
+          <button type="button" class="chip" data-filter="lang-en">
+            <span class="dot"></span> 영문
+          </button>
+          <button type="button" class="chip" data-filter="lang-ja">
+            <span class="dot"></span> 일문
+          </button>
+        </div>
 
-<div class="panel">
-<h2>3) 안내문 생성</h2>
-<label>타깃 고객 메모 (선택)</label>
-<input id="target">
-<label>[제목] 이메일 안내 제목</label>
-<div class="box" id="subBox"></div>
-<label>[본문] 안내문</label>
-<div class="box" id="bodyBox"></div>
-<button class="btn" id="regen">안내문 재생성</button>
-<button class="btn" id="cSub">제목 복사</button>
-<button class="btn" id="cBody">본문 복사</button>
-</div>
+        <div class="btn-row">
+          <button type="button" class="btn-primary" id="newContentBtn">새 컨텐츠 추가</button>
+          <button type="button" class="btn-secondary" id="scrollToFormBtn">선택 항목 편집 영역으로 이동</button>
+        </div>
 
-</main>
+        <div class="tagline">
+          · 목록에서 항목을 클릭하면 오른쪽 카드 입력 영역에 내용이 채워집니다.
+        </div>
 
-<footer>Contents → 분석 → 안내문 생성. 오직 이 기능만 존재.</footer>
+        <div class="content-list" id="contentList" aria-label="컨텐츠 목록">
+          <div class="content-list-empty">
+            등록된 컨텐츠가 없습니다.<br />
+            오른쪽 영역의 &lt;컨텐츠 저장/업데이트&gt; 버튼으로 첫 항목을 등록해 주세요.
+          </div>
+        </div>
 
-<script>
-function n(t){return t.replace(/\r?\n/g," ").replace(/[(){}\[\].,;:+*/\\!?"'<>]|[-]/g," ").toLowerCase();}
-function extract(raw,extra){
-const text=n(raw||"");
-const t=text.split(/\s+/).filter(Boolean);
-const stop=["및","그리고","또한","시장","자료","보고","분석","연구","대한","하는","있는","최근","기술","산업","전망","module","market","report"];
-const f={};t.forEach(w=>{if(w.length<2)return;if(stop.includes(w))return;f[w]=(f[w]||0)+1;});
-(extra||[]).forEach(k=>{const w=k.trim().toLowerCase();if(w)f[w]=(f[w]||0)+3;});
-return Object.entries(f).sort((a,b)=>b[1]-a[1]).map(v=>v[0]).slice(0,8);
-}
-function fields(txt){
-const t=(txt||"").toLowerCase(),out=[];
-const rules=[
-{name:"자동차/모빌리티",k:["자동차","전기차","ev","adas","자율주행","모빌리티","물류"]},
-{name:"통신/IT/보안",k:["통신","5g","iot","보안","security","cloud","ai","it"]},
-{name:"소재/화학/접착제",k:["접착","점착","테이프","adhesive","resin","polymer","glass substrate","글래스 기판","bonding"]},
-{name:"반도체/디스플레이",k:["반도체","semiconductor","웨이퍼","패키징","display","oled"]},
-{name:"에너지/배터리/태양광",k:["배터리","2차전지","ess","태양광","solar","solar cell","perovskite"]},
-{name:"바이오/의료",k:["바이오","bio","제약","medical","헬스케어"]},
-{name:"정책/경제/산업전략",k:["정책","policy","규제","investment","경제","산업동향"]}
-];
-rules.forEach(r=>{if(r.k.some(x=>t.includes(x.toLowerCase())))out.push(r.name);});
-return out.length?out:["기타/범용"];
-}
-function seg(fs,ch){
-const s=[],h=n=>fs.includes(n);
-if(h("소재/화학/접착제")||h("반도체/디스플레이")||h("에너지/배터리/태양광")){s.push("• 정부출연연 연구원 및 기업 R&D 소재·공정팀");}
-if(h("자동차/모빌리티"))s.push("• 완성차·부품사 R&D 및 전략팀");
-if(h("통신/IT/보안"))s.push("• IT/보안 기술연구팀");
-if(h("바이오/의료"))s.push("• 바이오/의료 연구팀");
-if(h("정책/경제/산업전략"))s.push("• 정책/산업전략 연구자");
-if(!s.length)s.push("• 일반 R&D 및 전략기획 부서");
-if(ch==="bidding")s.push("• 입찰/과제 담당 부서");
-return s;
-}
-function oneLine(t,fs,sg){
-const tt=t?`「${t}」`:"이 컨텐츠";
-const f=fs.join(", ");
-return `• ${tt}를 ${f} 자료로 보고,\n• 주로 ${sg[0].replace(/^•\s*/,"")}에게 안내하도록 추천합니다.`;
-}
-function mail(t,fs,kw,sg,ch,target){
-const f=fs[0],k=kw.length?`주요 키워드는 ${kw.slice(0,5).join(", ")} 입니다.`:"핵심 키워드는 요약문 참고";
-let tar=`이번 안내의 주요 대상은 ${sg[0].replace(/^•\s*/,"")} 입니다.`;if(target.trim())tar+=`\n(특히 ${target.trim()} 대상)`;
-let chLine="";if(ch==="email")chLine="이메일 회신 시 상세목차 제공";
-else if(ch==="web")chLine="웹 게시 + 문의 시 상세 정보 제공";
-else if(ch==="bidding")chLine="입찰/과제 배경자료로 제공 가능";
-else if(ch==="mix")chLine="웹 게시 + 핵심 고객 이메일 병행";
-else chLine="요청 방식에 따라 제공";
-return {
-subject:`[자료 안내] ${t||"신규 컨텐츠"} – ${f}`,
-body:`안녕하세요, 월드산업정보센터(WIC)입니다.\n\n${f} 관련 신규 컨텐츠를 안내드립니다.\n${k}\n\n${tar}\n\n관심 있으시면 회신 또는 문의 주시면 상세 목차와 제공 방식을 보내드리겠습니다.\n${chLine}\n\n감사합니다.\n월드산업정보센터 드림`
-};
-}
-function chips(box,arr){
-box.innerHTML="";
-arr.forEach((v,i)=>{const x=document.createElement("span");x.className="chip"+(i===0?" main":"");x.textContent=v;box.appendChild(x);});
-}
+        <div class="status-line" id="listStatusLine">
+          <span class="status-chip idle">목록 · 필터 적용 대기</span>
+          <span class="status-text">검색 및 필터 조합으로 고객에게 보여줄 후보만 추릴 수 있습니다.</span>
+        </div>
+      </section>
 
-const el={
-title:document.getElementById("title"),
-summary:document.getElementById("summary"),
-keywords:document.getElementById("keywords"),
-channel:document.getElementById("channel"),
-target:document.getElementById("target"),
-kwBox:document.getElementById("kwBox"),
-fieldBox:document.getElementById("fieldBox"),
-segBox:document.getElementById("segBox"),
-sumBox:document.getElementById("sumBox"),
-subBox:document.getElementById("subBox"),
-bodyBox:document.getElementById("bodyBox")
-};
-let S={kw:[],fs:[],sg:[],ml:{}};
+      <!-- RIGHT: 컨텐츠 카드 입력 + 안내문 생성 -->
+      <section class="card" aria-label="컨텐츠 카드 입력 및 안내문 자동 생성">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              <span class="index">②</span>
+              컨텐츠 카드 입력 / 수정
+            </div>
+            <div class="card-subtitle">선택한 항목을 수정하거나 새 컨텐츠를 추가</div>
+          </div>
+          <span class="pill" id="selectedLabel">선택: 없음</span>
+        </div>
 
-document.getElementById("analyze").onclick=()=>{
-const title=el.title.value||"",summary=el.summary.value||"",extra=el.keywords.value.split(",").map(v=>v.trim()).filter(Boolean),ch=el.channel.value;
-const base=[title,summary,extra.join(" ")].join(" ");
-const kw=extract(base,extra),fs=fields(base),sg=seg(fs,ch);
-S.kw=kw;S.fs=fs;S.sg=sg;
-chips(el.kwBox,kw);chips(el.fieldBox,fs);
-el.segBox.textContent=sg.join("\n");
-el.sumBox.textContent=oneLine(title,fs,sg);
-const m=mail(title,fs,kw,sg,ch,el.target.value);S.ml=m;
-el.subBox.textContent=m.subject;el.bodyBox.textContent=m.body;
-};
+        <div class="form-row">
+          <label for="contentTitle">
+            컨텐츠 제목 <span class="req">*</span>
+          </label>
+          <input
+            id="contentTitle"
+            type="text"
+            placeholder="예: 후지경제 - 세계 불소계 가스 및 SK 스페셜티 수요 분석"
+          />
+        </div>
 
-document.getElementById("regen").onclick=()=>{
-const m=mail(el.title.value||"",S.fs.length?S.fs:["기타/범용"],S.kw,S.sg,el.channel.value,el.target.value);
-S.ml=m;el.subBox.textContent=m.subject;el.bodyBox.textContent=m.body;
-};
+        <div class="form-row-inline">
+          <div class="form-row">
+            <label for="contentType">
+              유형 <span class="req">*</span>
+            </label>
+            <select id="contentType">
+              <option value="report">보고서</option>
+              <option value="video">동영상</option>
+              <option value="article">기사/뉴스</option>
+              <option value="other">기타</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="contentLanguage">
+              언어 <span class="req">*</span>
+            </label>
+            <select id="contentLanguage">
+              <option value="ko">국문</option>
+              <option value="en">영문</option>
+              <option value="ja">일문</option>
+              <option value="multi">복수 언어</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="contentStatus">
+              상태
+            </label>
+            <select id="contentStatus">
+              <option value="active">사용 중</option>
+              <option value="hidden">숨김 (내부정리용)</option>
+            </select>
+          </div>
+        </div>
 
-document.getElementById("cSub").onclick=()=>navigator.clipboard.writeText(el.subBox.textContent||"");
-document.getElementById("cBody").onclick=()=>navigator.clipboard.writeText(el.bodyBox.textContent||"");
-</script>
+        <div class="form-row-inline">
+          <div class="form-row">
+            <label for="contentPublisher">
+              발행사 / 출처
+            </label>
+            <input
+              id="contentPublisher"
+              type="text"
+              placeholder="예: 후지경제 / Global Insight Services / 자체 자료"
+            />
+          </div>
+          <div class="form-row">
+            <label for="contentAudience">
+              대상 고객 메모
+            </label>
+            <input
+              id="contentAudience"
+              type="text"
+              placeholder="예: SK 스페셜티 / 불소계 가스 / 공정개발팀"
+            />
+          </div>
+        </div>
 
+        <div class="form-row">
+          <label for="contentKeywords">
+            키워드 (쉼표로 구분)
+          </label>
+          <input
+            id="contentKeywords"
+            type="text"
+            placeholder="예: Sulfur Hexafluoride, 반도체 가스, 글래스 섭스트레이트, 후지경제, SK 스페셜티"
+          />
+          <div class="hint">고객 검색용, 안내문 생성용 키워드를 간단히 정리합니다.</div>
+        </div>
+
+        <div class="form-row">
+          <label for="contentUrl">
+            링크 (내부 or 외부 URL)
+          </label>
+          <input
+            id="contentUrl"
+            type="url"
+            placeholder="예: https://www.example.com/report-detail"
+          />
+          <div class="hint">실제 접속 가능한 URL이 있으면 입력합니다. 없으면 비워두어도 됩니다.</div>
+        </div>
+
+        <div class="form-row">
+          <label for="contentNotes">
+            내부용 메모 (가격, 버전, 추가 설명 등)
+          </label>
+          <textarea
+            id="contentNotes"
+            placeholder="예: 2025년판 / PDF+데이터 세트 / 연구소용 대량 구매 가능 / 고객이 특히 관심을 보였던 그래프 위치 메모 등"
+          ></textarea>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn-primary" id="saveContentBtn">
+            컨텐츠 저장/업데이트
+          </button>
+          <button type="button" class="btn-secondary" id="resetFormBtn">
+            새 항목으로 초기화
+          </button>
+          <button type="button" class="btn-danger" id="deleteContentBtn" disabled>
+            선택 항목 숨김 처리
+          </button>
+        </div>
+
+        <div class="url-row">
+          <span>
+            <strong>간단 요약</strong>
+            <span id="summaryInline" class="muted">제목, 유형, 언어, 발행사를 입력하면 여기 간단 요약이 표시됩니다.</span>
+          </span>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              <span class="index">③</span>
+              고객 안내문 자동 생성
+            </div>
+            <div class="card-subtitle">선택한 컨텐츠로 바로 보낼 수 있는 초안 만들기</div>
+          </div>
+          <span class="pill">이메일 / 메신저 공통 사용 가능</span>
+        </div>
+
+        <div class="form-row-inline">
+          <div class="form-row">
+            <label for="clientName">
+              고객명
+            </label>
+            <input id="clientName" type="text" placeholder="예: 조용준 박사님" />
+          </div>
+          <div class="form-row">
+            <label for="clientOrg">
+              기관 / 부서
+            </label>
+            <input
+              id="clientOrg"
+              type="text"
+              placeholder="예: SK 스페셜티 · 공정개발팀"
+            />
+          </div>
+        </div>
+
+        <div class="form-row-inline">
+          <div class="form-row">
+            <label for="guidePurpose">
+              안내 목적
+            </label>
+            <select id="guidePurpose">
+              <option value="first">첫 문의용 자료 안내</option>
+              <option value="followup">후속 안내 (추가 제안)</option>
+              <option value="free">무료 참고자료 위주 안내</option>
+              <option value="summary">기존 논의 정리 + 요약 안내</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="guideTone">
+              톤 &amp; 길이
+            </label>
+            <select id="guideTone">
+              <option value="standard">표준 · 보통 길이</option>
+              <option value="short">간단 · 짧게</option>
+              <option value="polite">정중 · 조금 길게</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="closingSentence">
+            맺음말 기본 문장
+          </label>
+          <input
+            id="closingSentence"
+            type="text"
+            placeholder="예: 검토 후 궁금하신 점이나 추가로 필요하신 주제가 있으시면 언제든지 말씀 부탁드립니다."
+          />
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn-primary" id="generateGuideBtn">
+            선택한 컨텐츠로 안내문 생성
+          </button>
+          <button type="button" class="btn-secondary" id="copyGuideBtn" disabled>
+            안내문 클립보드 복사
+          </button>
+        </div>
+
+        <div class="notice-box">
+          <strong>안내</strong> · 왼쪽 목록에서 <strong>한 개 이상</strong> 컨텐츠를 선택한 뒤, 위 옵션을 설정하고
+          &lt;선택한 컨텐츠로 안내문 생성&gt;을 누르면 아래에 본문이 만들어집니다.
+        </div>
+
+        <div class="preview-box" id="guidePreview" aria-label="안내문 미리보기">
+          <div class="preview-placeholder">
+            ① 왼쪽에서 컨텐츠를 하나 이상 선택합니다.<br />
+            ② 위쪽에서 고객명·기관·안내 목적을 선택합니다.<br />
+            ③ &lt;선택한 컨텐츠로 안내문 생성&gt; 버튼을 누르면 이곳에 안내문 초안이 표시됩니다.
+          </div>
+        </div>
+
+        <div class="preview-meta-row">
+          <span class="count" id="guideMetaText">글자 수: 0자 · 줄 수: 0줄</span>
+          <span class="small-pill" id="selectionInfo">선택된 컨텐츠: 0개</span>
+        </div>
+
+        <div class="status-line" id="detailStatusLine">
+          <span class="status-chip idle" id="saveStatusChip">저장 대기</span>
+          <span class="status-text" id="saveStatusText">
+            모든 내용은 이 브라우저의 localStorage에 자동 저장됩니다.
+          </span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const STORAGE_KEY_CONTENTS = "wic_tool9_contents_v1";
+      const STORAGE_KEY_META = "wic_tool9_meta_v1";
+
+      const contentListEl = document.getElementById("contentList");
+      const contentCountLabel = document.getElementById("contentCountLabel");
+      const listStatusLine = document.getElementById("listStatusLine");
+
+      const searchInput = document.getElementById("searchInput");
+      const filterChips = Array.from(document.querySelectorAll(".chip"));
+      const newContentBtn = document.getElementById("newContentBtn");
+      const scrollToFormBtn = document.getElementById("scrollToFormBtn");
+
+      const selectedLabel = document.getElementById("selectedLabel");
+      const summaryInline = document.getElementById("summaryInline");
+      const deleteContentBtn = document.getElementById("deleteContentBtn");
+      const saveContentBtn = document.getElementById("saveContentBtn");
+      const resetFormBtn = document.getElementById("resetFormBtn");
+
+      const contentTitle = document.getElementById("contentTitle");
+      const contentType = document.getElementById("contentType");
+      const contentLanguage = document.getElementById("contentLanguage");
+      const contentStatus = document.getElementById("contentStatus");
+      const contentPublisher = document.getElementById("contentPublisher");
+      const contentAudience = document.getElementById("contentAudience");
+      const contentKeywords = document.getElementById("contentKeywords");
+      const contentUrl = document.getElementById("contentUrl");
+      const contentNotes = document.getElementById("contentNotes");
+
+      const clientName = document.getElementById("clientName");
+      const clientOrg = document.getElementById("clientOrg");
+      const guidePurpose = document.getElementById("guidePurpose");
+      const guideTone = document.getElementById("guideTone");
+      const closingSentence = document.getElementById("closingSentence");
+      const generateGuideBtn = document.getElementById("generateGuideBtn");
+      const copyGuideBtn = document.getElementById("copyGuideBtn");
+      const guidePreview = document.getElementById("guidePreview");
+      const guideMetaText = document.getElementById("guideMetaText");
+      const selectionInfo = document.getElementById("selectionInfo");
+
+      const saveStatusChip = document.getElementById("saveStatusChip");
+      const saveStatusText = document.getElementById("saveStatusText");
+
+      let contents = [];
+      let selectedId = null;
+      let activeFilters = {
+        status: "active", // active / all
+        types: new Set(), // report, video, article, other
+        lang: "all" // all, ko, en, ja, multi
+      };
+
+      let selectedIdsForGuide = new Set();
+
+      function nowTimeString() {
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, "0");
+        const mm = String(now.getMinutes()).padStart(2, "0");
+        const ss = String(now.getSeconds()).padStart(2, "0");
+        return `${hh}:${mm}:${ss}`;
+      }
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY_CONTENTS);
+          if (raw) {
+            contents = JSON.parse(raw);
+            if (!Array.isArray(contents)) {
+              contents = [];
+            }
+          } else {
+            contents = createInitialSampleData();
+          }
+        } catch (e) {
+          contents = createInitialSampleData();
+        }
+
+        try {
+          const metaRaw = localStorage.getItem(STORAGE_KEY_META);
+          if (metaRaw) {
+            const meta = JSON.parse(metaRaw);
+            if (meta && typeof meta === "object") {
+              if (typeof meta.lastClosingSentence === "string") {
+                closingSentence.value = meta.lastClosingSentence;
+              }
+            }
+          } else {
+            closingSentence.value =
+              "검토 후 궁금하신 점이나 추가로 필요하신 주제가 있으시면 언제든지 편하게 말씀 부탁드립니다.";
+          }
+        } catch (e) {
+          closingSentence.value =
+            "검토 후 궁금하신 점이나 추가로 필요하신 주제가 있으시면 언제든지 편하게 말씀 부탁드립니다.";
+        }
+      }
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY_CONTENTS, JSON.stringify(contents));
+        } catch (e) {
+          // ignore storage errors
+        }
+
+        try {
+          const meta = {
+            lastClosingSentence: closingSentence.value || ""
+          };
+          localStorage.setItem(STORAGE_KEY_META, JSON.stringify(meta));
+        } catch (e) {
+          // ignore
+        }
+
+        updateSaveStatus("success", `자동 저장 완료 · ${nowTimeString()}`);
+      }
+
+      function updateSaveStatus(mode, message) {
+        if (mode === "success") {
+          saveStatusChip.classList.remove("warn", "idle");
+          saveStatusChip.classList.add("success");
+          saveStatusChip.textContent = "저장 완료";
+        } else if (mode === "warn") {
+          saveStatusChip.classList.remove("success", "idle");
+          saveStatusChip.classList.add("warn");
+          saveStatusChip.textContent = "확인 필요";
+        } else {
+          saveStatusChip.classList.remove("success", "warn");
+          saveStatusChip.classList.add("idle");
+          saveStatusChip.textContent = "저장 대기";
+        }
+        saveStatusText.textContent = message;
+      }
+
+      function createInitialSampleData() {
+        const base = [
+          {
+            id: "sample-1",
+            title: "후지경제 - 세계 불소계 가스 시장 · SK 스페셜티 수요 분석",
+            type: "report",
+            language: "ja",
+            status: "active",
+            publisher: "후지경제",
+            audience: "SK 스페셜티 · 불소계 가스 / 공정개발팀",
+            keywords: "Sulfur Hexafluoride, 불소계 가스, SK 스페셜티, 반도체 공정",
+            url: "",
+            notes:
+              "정식 견적 필요 시 후지경제 본사와 별도 협의. SK 스페셜티 담당자는 불소계 가스 및 수요 전망 그래프에 관심.",
+            createdAt: Date.now() - 100000,
+            updatedAt: Date.now() - 100000
+          },
+          {
+            id: "sample-2",
+            title: "Global Insight Services - Sulfur Hexafluoride (SF6) Global Market Report",
+            type: "report",
+            language: "en",
+            status: "active",
+            publisher: "Global Insight Services",
+            audience: "국내 연구소 및 반도체 소재 업체",
+            keywords: "SF6, Sulfur Hexafluoride, 글로벌 시장, 반도체, 가스 소재",
+            url: "",
+            notes: "조용준 박사님 요청 후보 1순위로 사용했던 자료.",
+            createdAt: Date.now() - 90000,
+            updatedAt: Date.now() - 90000
+          },
+          {
+            id: "sample-3",
+            title: "WIC 무료 요약 자료 - 불소계 가스 시장 개요 (국문 PDF 4p)",
+            type: "other",
+            language: "ko",
+            status: "active",
+            publisher: "월드산업정보센터(WIC)",
+            audience: "불소계 가스/반도체 가스에 관심 있는 신규 고객",
+            keywords: "무료 자료, 요약, 불소계 가스, WIC 자체 정리",
+            url: "",
+            notes: "WIC가 자체 제작한 무료 요약 자료. 신규 문의 고객에게 선제적으로 제공 가능.",
+            createdAt: Date.now() - 80000,
+            updatedAt: Date.now() - 80000
+          }
+        ];
+        return base;
+      }
+
+      function renderContentsList() {
+        contentListEl.innerHTML = "";
+
+        const query = (searchInput.value || "").toLowerCase().trim();
+        const showHidden = activeFilters.status === "all";
+        const langFilter = activeFilters.lang;
+        const typeSet = activeFilters.types;
+
+        const filtered = contents.filter((item) => {
+          if (!showHidden && item.status === "hidden") {
+            return false;
+          }
+
+          if (langFilter !== "all") {
+            if (item.language !== langFilter) return false;
+          }
+
+          if (typeSet.size > 0) {
+            if (!typeSet.has(item.type)) return false;
+          }
+
+          if (query.length > 0) {
+            const hay = [
+              item.title,
+              item.publisher,
+              item.audience,
+              item.keywords
+            ]
+              .join(" ")
+              .toLowerCase();
+            if (!hay.includes(query)) return false;
+          }
+
+          return true;
+        });
+
+        const totalCount = contents.length;
+        const visibleCount = filtered.length;
+        contentCountLabel.textContent = `등록 ${visibleCount}건 / 전체 ${totalCount}건`;
+
+        if (filtered.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "content-list-empty";
+          empty.textContent =
+            "조건에 맞는 컨텐츠가 없습니다. 검색어나 필터를 조정해 주세요.";
+          contentListEl.appendChild(empty);
+        } else {
+          filtered
+            .slice()
+            .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
+            .forEach((item) => {
+              const el = document.createElement("div");
+              el.className = "content-item";
+
+              const isSelected = selectedId === item.id;
+              if (isSelected) {
+                el.classList.add("selected");
+              }
+
+              const header = document.createElement("div");
+              header.className = "content-item-header";
+
+              const titleSpan = document.createElement("div");
+              titleSpan.className = "content-item-title";
+              titleSpan.textContent = item.title || "(제목 없음)";
+
+              const badges = document.createElement("div");
+              badges.className = "content-item-meta";
+
+              const typeBadge = document.createElement("span");
+              typeBadge.className = "badge";
+              if (item.type === "report") typeBadge.classList.add("type-report");
+              else if (item.type === "video")
+                typeBadge.classList.add("type-video");
+              else if (item.type === "article")
+                typeBadge.classList.add("type-article");
+              typeBadge.textContent =
+                item.type === "report"
+                  ? "보고서"
+                  : item.type === "video"
+                  ? "동영상"
+                  : item.type === "article"
+                  ? "기사/뉴스"
+                  : "기타";
+
+              const langBadge = document.createElement("span");
+              langBadge.className = "badge lang";
+              let langLabel = "언어";
+              if (item.language === "ko") langLabel = "국문";
+              else if (item.language === "en") langLabel = "영문";
+              else if (item.language === "ja") langLabel = "일문";
+              else if (item.language === "multi") langLabel = "복수 언어";
+              langBadge.textContent = langLabel;
+
+              badges.appendChild(typeBadge);
+              badges.appendChild(langBadge);
+
+              if (item.status === "hidden") {
+                const hiddenBadge = document.createElement("span");
+                hiddenBadge.className = "badge hidden";
+                hiddenBadge.textContent = "숨김";
+                badges.appendChild(hiddenBadge);
+              }
+
+              if (item.publisher) {
+                const pubBadge = document.createElement("span");
+                pubBadge.className = "badge";
+                pubBadge.textContent = item.publisher;
+                badges.appendChild(pubBadge);
+              }
+
+              header.appendChild(titleSpan);
+              header.appendChild(badges);
+
+              const keywordsDiv = document.createElement("div");
+              keywordsDiv.className = "content-item-keywords";
+              if (item.keywords) {
+                keywordsDiv.textContent = item.keywords;
+              } else if (item.audience) {
+                keywordsDiv.textContent = item.audience;
+              } else {
+                keywordsDiv.textContent = "키워드/대상 고객 메모가 없습니다.";
+              }
+
+              el.appendChild(header);
+              el.appendChild(keywordsDiv);
+
+              el.addEventListener("click", () => {
+                handleSelectItem(item.id);
+              });
+
+              contentListEl.appendChild(el);
+            });
+        }
+
+        const statusChipSpan = document.createElement("span");
+        statusChipSpan.className = "status-chip success";
+        statusChipSpan.textContent = "목록 업데이트";
+        const statusTextSpan = document.createElement("span");
+        statusTextSpan.className = "status-text";
+        statusTextSpan.textContent = `필터 적용 후 ${visibleCount}건이 표시되었습니다.`;
+
+        listStatusLine.innerHTML = "";
+        listStatusLine.appendChild(statusChipSpan);
+        listStatusLine.appendChild(statusTextSpan);
+
+        updateSelectionInfo();
+      }
+
+      function handleSelectItem(id) {
+        selectedId = id;
+        const item = contents.find((c) => c.id === id);
+        if (!item) return;
+
+        fillFormFromItem(item);
+
+        if (!selectedIdsForGuide.has(id)) {
+          selectedIdsForGuide.add(id);
+        }
+        updateSelectionInfo();
+
+        renderContentsList();
+      }
+
+      function fillFormFromItem(item) {
+        contentTitle.value = item.title || "";
+        contentType.value = item.type || "report";
+        contentLanguage.value = item.language || "ko";
+        contentStatus.value = item.status || "active";
+        contentPublisher.value = item.publisher || "";
+        contentAudience.value = item.audience || "";
+        contentKeywords.value = item.keywords || "";
+        contentUrl.value = item.url || "";
+        contentNotes.value = item.notes || "";
+
+        selectedLabel.textContent = `선택: ${item.title || "(제목 없음)"}`;
+        deleteContentBtn.disabled = false;
+
+        updateSummaryInline();
+        updateSaveStatus("idle", "선택된 컨텐츠를 편집할 수 있습니다.");
+      }
+
+      function clearFormForNew() {
+        selectedId = null;
+        contentTitle.value = "";
+        contentType.value = "report";
+        contentLanguage.value = "ko";
+        contentStatus.value = "active";
+        contentPublisher.value = "";
+        contentAudience.value = "";
+        contentKeywords.value = "";
+        contentUrl.value = "";
+        contentNotes.value = "";
+
+        selectedLabel.textContent = "선택: 없음";
+        deleteContentBtn.disabled = true;
+        updateSummaryInline();
+        updateSelectionInfo();
+        updateSaveStatus("idle", "새 컨텐츠를 입력할 수 있습니다.");
+        renderContentsList();
+      }
+
+      function updateSummaryInline() {
+        const title = contentTitle.value.trim();
+        const type = contentType.value;
+        const lang = contentLanguage.value;
+        const publisher = contentPublisher.value.trim();
+
+        if (!title) {
+          summaryInline.textContent =
+            "제목, 유형, 언어, 발행사를 입력하면 여기 간단 요약이 표시됩니다.";
+          return;
+        }
+
+        const typeLabel =
+          type === "report"
+            ? "보고서"
+            : type === "video"
+            ? "동영상"
+            : type === "article"
+            ? "기사/뉴스"
+            : "기타";
+
+        let langLabel = "";
+        if (lang === "ko") langLabel = "국문";
+        else if (lang === "en") langLabel = "영문";
+        else if (lang === "ja") langLabel = "일문";
+        else if (lang === "multi") langLabel = "복수 언어";
+
+        const parts = [];
+        parts.push(`[${typeLabel}${langLabel ? " · " + langLabel : ""}]`);
+        parts.push(title);
+        if (publisher) {
+          parts.push(`(발행사: ${publisher})`);
+        }
+
+        summaryInline.textContent = parts.join(" ");
+      }
+
+      function saveCurrentForm() {
+        const title = contentTitle.value.trim();
+        if (!title) {
+          updateSaveStatus("warn", "제목은 필수입니다. 제목을 입력해 주세요.");
+          contentTitle.focus();
+          return;
+        }
+
+        const type = contentType.value || "report";
+        const language = contentLanguage.value || "ko";
+        const status = contentStatus.value || "active";
+
+        if (!["report", "video", "article", "other"].includes(type)) {
+          updateSaveStatus("warn", "유효하지 않은 유형입니다.");
+          return;
+        }
+        if (!["ko", "en", "ja", "multi"].includes(language)) {
+          updateSaveStatus("warn", "유효하지 않은 언어 값입니다.");
+          return;
+        }
+        if (!["active", "hidden"].includes(status)) {
+          updateSaveStatus("warn", "유효하지 않은 상태 값입니다.");
+          return;
+        }
+
+        const payload = {
+          title,
+          type,
+          language,
+          status,
+          publisher: contentPublisher.value.trim(),
+          audience: contentAudience.value.trim(),
+          keywords: contentKeywords.value.trim(),
+          url: contentUrl.value.trim(),
+          notes: contentNotes.value.trim()
+        };
+
+        const now = Date.now();
+
+        if (selectedId) {
+          const idx = contents.findIndex((c) => c.id === selectedId);
+          if (idx >= 0) {
+            contents[idx] = {
+              ...contents[idx],
+              ...payload,
+              updatedAt: now
+            };
+          }
+        } else {
+          const id = `content-${now}-${Math.floor(Math.random() * 1000)}`;
+          contents.push({
+            id,
+            ...payload,
+            createdAt: now,
+            updatedAt: now
+          });
+          selectedId = id;
+        }
+
+        if (selectedId && !selectedIdsForGuide.has(selectedId)) {
+          selectedIdsForGuide.add(selectedId);
+        }
+
+        updateSummaryInline();
+        saveState();
+        renderContentsList();
+      }
+
+      function softDeleteSelected() {
+        if (!selectedId) return;
+        const idx = contents.findIndex((c) => c.id === selectedId);
+        if (idx < 0) return;
+
+        contents[idx].status = "hidden";
+        contents[idx].updatedAt = Date.now();
+        saveState();
+
+        selectedIdsForGuide.delete(selectedId);
+        updateSelectionInfo();
+        renderContentsList();
+        clearFormForNew();
+      }
+
+      function setFilterActive(groupKey, valueKey) {
+        if (groupKey === "status") {
+          activeFilters.status = valueKey;
+          filterChips.forEach((chip) => {
+            const f = chip.getAttribute("data-filter");
+            if (f === "status-active" || f === "status-all") {
+              chip.classList.remove("active");
+            }
+          });
+          filterChips.forEach((chip) => {
+            const f = chip.getAttribute("data-filter");
+            if (
+              (valueKey === "active" && f === "status-active") ||
+              (valueKey === "all" && f === "status-all")
+            ) {
+              chip.classList.add("active");
+            }
+          });
+        } else if (groupKey === "lang") {
+          activeFilters.lang = valueKey;
+          filterChips.forEach((chip) => {
+            const f = chip.getAttribute("data-filter");
+            if (
+              f === "lang-all" ||
+              f === "lang-ko" ||
+              f === "lang-en" ||
+              f === "lang-ja"
+            ) {
+              chip.classList.remove("active");
+            }
+          });
+          filterChips.forEach((chip) => {
+            const f = chip.getAttribute("data-filter");
+            if (
+              (valueKey === "all" && f === "lang-all") ||
+              (valueKey === "ko" && f === "lang-ko") ||
+              (valueKey === "en" && f === "lang-en") ||
+              (valueKey === "ja" && f === "lang-ja")
+            ) {
+              chip.classList.add("active");
+            }
+          });
+        }
+      }
+
+      function toggleTypeFilter(typeKey) {
+        if (activeFilters.types.has(typeKey)) {
+          activeFilters.types.delete(typeKey);
+        } else {
+          activeFilters.types.add(typeKey);
+        }
+      }
+
+      function handleChipClick(chip) {
+        const f = chip.getAttribute("data-filter");
+        if (!f) return;
+
+        if (f === "status-active") {
+          setFilterActive("status", "active");
+        } else if (f === "status-all") {
+          setFilterActive("status", "all");
+        } else if (f === "lang-all") {
+          setFilterActive("lang", "all");
+        } else if (f === "lang-ko") {
+          setFilterActive("lang", "ko");
+        } else if (f === "lang-en") {
+          setFilterActive("lang", "en");
+        } else if (f === "lang-ja") {
+          setFilterActive("lang", "ja");
+        } else if (
+          f === "type-report" ||
+          f === "type-video" ||
+          f === "type-article" ||
+          f === "type-other"
+        ) {
+          let typeKey = "report";
+          if (f === "type-video") typeKey = "video";
+          else if (f === "type-article") typeKey = "article";
+          else if (f === "type-other") typeKey = "other";
+
+          chip.classList.toggle("active");
+          toggleTypeFilter(typeKey);
+        }
+
+        renderContentsList();
+      }
+
+      function updateSelectionInfo() {
+        const count = selectedIdsForGuide.size;
+        selectionInfo.textContent = `선택된 컨텐츠: ${count}개`;
+      }
+
+      function generateGuideText() {
+        const selectedItems = contents.filter((c) =>
+          selectedIdsForGuide.has(c.id)
+        );
+
+        if (selectedItems.length === 0) {
+          guidePreview.innerHTML =
+            '<div class="preview-placeholder">왼쪽 목록에서 하나 이상 컨텐츠를 선택해 주세요.</div>';
+          guideMetaText.textContent = "글자 수: 0자 · 줄 수: 0줄";
+          copyGuideBtn.disabled = true;
+          return;
+        }
+
+        const name = clientName.value.trim();
+        const org = clientOrg.value.trim();
+        const purpose = guidePurpose.value;
+        const tone = guideTone.value;
+        const closing = closingSentence.value.trim();
+
+        const lines = [];
+
+        let firstLine = "";
+        if (name && org) {
+          firstLine = `${org} ${name}께,`;
+        } else if (name) {
+          firstLine = `${name}께,`;
+        } else if (org) {
+          firstLine = `${org} 담당자님께,`;
+        } else {
+          firstLine = "안녕하세요.";
+        }
+        lines.push(firstLine);
+        lines.push("");
+
+        if (purpose === "first") {
+          lines.push(
+            "월드산업정보센터(WIC)에서 문의 주신 주제와 관련된 컨텐츠 자료를 정리하여 안내드립니다."
+          );
+        } else if (purpose === "followup") {
+          lines.push(
+            "이전에 논의드렸던 내용과 연계하여 참고하실 수 있는 추가 컨텐츠 자료를 아래와 같이 정리해 보았습니다."
+          );
+        } else if (purpose === "free") {
+          lines.push(
+            "부담 없이 검토하실 수 있도록 무료 또는 간단히 참고 가능한 컨텐츠 위주로 선별하여 안내드립니다."
+          );
+        } else if (purpose === "summary") {
+          lines.push(
+            "지금까지의 논의를 정리하면서, 함께 검토하시면 도움이 될 만한 컨텐츠 자료를 아래와 같이 요약해 드립니다."
+          );
+        }
+
+        lines.push("");
+        lines.push("■ 컨텐츠 목록");
+
+        selectedItems.forEach((item, idx) => {
+          const no = idx + 1;
+          const typeLabel =
+            item.type === "report"
+              ? "보고서"
+              : item.type === "video"
+              ? "동영상"
+              : item.type === "article"
+              ? "기사/뉴스"
+              : "자료";
+
+          const langLabel =
+            item.language === "ko"
+              ? "국문"
+              : item.language === "en"
+              ? "영문"
+              : item.language === "ja"
+              ? "일문"
+              : item.language === "multi"
+              ? "복수 언어"
+              : "";
+
+          const title = item.title || "(제목 없음)";
+          const pub = item.publisher || "";
+          const keywords = item.keywords || "";
+          const url = item.url || "";
+
+          let line = `${no}) [${typeLabel}${
+            langLabel ? " · " + langLabel : ""
+          }] ${title}`;
+          if (pub) {
+            line += ` (발행사: ${pub})`;
+          }
+          lines.push(line);
+
+          if (keywords) {
+            lines.push(`   - 키워드: ${keywords}`);
+          }
+          if (url) {
+            lines.push(`   - 링크: ${url}`);
+          }
+          if (item.audience) {
+            lines.push(`   - 대상 메모: ${item.audience}`);
+          }
+        });
+
+        lines.push("");
+
+        if (tone === "short") {
+          lines.push(
+            "관심 있으신 항목을 알려주시면, 보다 자세한 견적 및 제공 방식에 대해 추가 안내드리겠습니다."
+          );
+        } else if (tone === "polite") {
+          lines.push(
+            "각 컨텐츠의 세부 목차, 데이터 포맷, 라이선스 조건 등에 대해서는 요청 주시면 상세한 자료와 함께 다시 정리하여 전달드리겠습니다."
+          );
+        } else {
+          lines.push(
+            "관심 있으신 항목 위주로 우선 검토해 보시고, 적합하다고 판단되시면 이후 진행 방향에 대해 말씀 주시면 좋겠습니다."
+          );
+        }
+
+        if (closing) {
+          lines.push("");
+          lines.push(closing);
+        }
+
+        lines.push("");
+        lines.push("감사합니다.");
+        lines.push("월드산업정보센터(WIC) 드림");
+
+        const text = lines.join("\n");
+        guidePreview.textContent = text;
+
+        const charCount = text.replace(/\n/g, "").length;
+        const lineCount = lines.length;
+        guideMetaText.textContent = `글자 수: ${charCount}자 · 줄 수: ${lineCount}줄`;
+        copyGuideBtn.disabled = text.trim().length === 0;
+      }
+
+      async function copyGuideToClipboard() {
+        const text = guidePreview.textContent || "";
+        if (!text.trim()) return;
+
+        try {
+          await navigator.clipboard.writeText(text);
+          guideMetaText.textContent += " · 클립보드 복사 완료";
+        } catch (e) {
+          guideMetaText.textContent += " · 클립보드 복사 실패 (브라우저 설정 확인 필요)";
+        }
+      }
+
+      function attachEvents() {
+        searchInput.addEventListener("input", () => {
+          renderContentsList();
+        });
+
+        filterChips.forEach((chip) => {
+          chip.addEventListener("click", () => handleChipClick(chip));
+        });
+
+        newContentBtn.addEventListener("click", () => {
+          clearFormForNew();
+        });
+
+        scrollToFormBtn.addEventListener("click", () => {
+          contentTitle.scrollIntoView({ behavior: "smooth", block: "center" });
+        });
+
+        [
+          contentTitle,
+          contentType,
+          contentLanguage,
+          contentStatus,
+          contentPublisher,
+          contentAudience,
+          contentKeywords,
+          contentUrl,
+          contentNotes
+        ].forEach((el) => {
+          el.addEventListener("input", () => {
+            updateSummaryInline();
+            updateSaveStatus("idle", "입력 내용이 변경되었습니다. 저장 버튼을 눌러 주세요.");
+          });
+        });
+
+        saveContentBtn.addEventListener("click", () => {
+          saveCurrentForm();
+        });
+
+        resetFormBtn.addEventListener("click", () => {
+          clearFormForNew();
+        });
+
+        deleteContentBtn.addEventListener("click", () => {
+          softDeleteSelected();
+        });
+
+        [clientName, clientOrg, guidePurpose, guideTone, closingSentence].forEach(
+          (el) => {
+            el.addEventListener("change", () => {
+              if (guidePreview.textContent && guidePreview.textContent.trim()) {
+                generateGuideText();
+              }
+            });
+          }
+        );
+
+        generateGuideBtn.addEventListener("click", () => {
+          generateGuideText();
+        });
+
+        copyGuideBtn.addEventListener("click", () => {
+          copyGuideToClipboard();
+        });
+      }
+
+      function init() {
+        loadState();
+        updateSummaryInline();
+        setFilterActive("status", "active");
+        setFilterActive("lang", "all");
+        renderContentsList();
+        attachEvents();
+        updateSaveStatus("success", `자동 저장 완료 · ${nowTimeString()}`);
+      }
+
+      init();
+    })();
+  </script>
 </body>
 </html>
