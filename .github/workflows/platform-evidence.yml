@@ -1,0 +1,49 @@
+name: WIC Platform Evidence
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  internal-platform-validation:
+    name: Internal platform validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Block synthetic fallback data
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f index.html
+          if grep -q "createInitialSampleData" index.html; then
+            echo "HOLD: synthetic fallback generator is still present in index.html"
+            exit 1
+          fi
+          if grep -q 'id: "sample-' index.html; then
+            echo "HOLD: sample records are still embedded in production index.html"
+            exit 1
+          fi
+          echo "PASS (internal platform only): no synthetic fallback/sample records found"
+
+      - name: Record platform evidence
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "repository=$GITHUB_REPOSITORY"
+            echo "commit=$GITHUB_SHA"
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "run_url=https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "classification=GitHub platform evidence; not independent validation"
+          } | tee platform-evidence.txt
+
+      - name: Upload platform evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wic09-platform-evidence
+          path: platform-evidence.txt
